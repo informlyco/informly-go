@@ -1,47 +1,4 @@
 # Reference
-## Health
-<details><summary><code>client.Health.HealthCheck() -> *informlygo.GetHealthResponse</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Returns the health status of the API service
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```go
-client.Health.HealthCheck(
-        context.TODO(),
-    )
-}
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
 ## Contacts
 <details><summary><code>client.Contacts.ListContacts() -> *informlygo.ListContactsResponse</code></summary>
 <dl>

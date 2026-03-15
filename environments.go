@@ -9,5 +9,5 @@ package api
 var Environments = struct {
 	Default string
 }{
-	Default: "http://localhost:4000/api/v1",
+	Default: "https://api.informly.com/v1",
 }

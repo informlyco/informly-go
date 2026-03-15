@@ -5,13 +5,11 @@ package client
 import (
 	contacts "github.com/informlyco/informly-go/contacts"
 	core "github.com/informlyco/informly-go/core"
-	health "github.com/informlyco/informly-go/health"
 	internal "github.com/informlyco/informly-go/internal"
 	option "github.com/informlyco/informly-go/option"
 )
 
 type Client struct {
-	Health   *health.Client
 	Contacts *contacts.Client
 
 	options *core.RequestOptions
@@ -22,7 +20,6 @@ type Client struct {
 func NewClient(opts ...option.RequestOption) *Client {
 	options := core.NewRequestOptions(opts...)
 	return &Client{
-		Health:   health.NewClient(options),
 		Contacts: contacts.NewClient(options),
 		options:  options,
 		baseURL:  options.BaseURL,
