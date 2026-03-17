@@ -6,6 +6,7 @@ The Informly Go library provides convenient access to the Informly APIs from Go.
 
 ## Table of Contents
 
+- [Documentation](#documentation)
 - [Reference](#reference)
 - [Usage](#usage)
 - [Environments](#environments)
@@ -17,6 +18,10 @@ The Informly Go library provides convenient access to the Informly APIs from Go.
   - [Timeouts](#timeouts)
   - [Explicit Null](#explicit-null)
 - [Contributing](#contributing)
+
+## Documentation
+
+API reference documentation is available [here](https://docs.informly.com/docs/api-reference).
 
 ## Reference
 
@@ -32,7 +37,7 @@ package example
 import (
     client "github.com/informlyco/informly-go/client"
     option "github.com/informlyco/informly-go/option"
-    informlygo "github.com/informlyco/informly-go"
+    informly "github.com/informlyco/informly-go"
     context "context"
 )
 
@@ -42,7 +47,7 @@ func do() {
             "<token>",
         ),
     )
-    request := &informlygo.CreateContact{}
+    request := &informly.CreateContact{}
     client.Contacts.CreateContact(
         context.TODO(),
         request,
@@ -57,7 +62,7 @@ URL, which is particularly useful in test environments.
 
 ```go
 client := client.NewClient(
-    option.WithBaseURL(api.Environments.Default),
+    option.WithBaseURL(informly.Environments.Default),
 )
 ```
 

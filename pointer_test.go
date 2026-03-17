@@ -1,4 +1,4 @@
-package api
+package informly
 
 import (
 	"testing"

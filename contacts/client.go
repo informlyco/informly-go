@@ -4,7 +4,7 @@ package contacts
 
 import (
 	context "context"
-	informlygo "github.com/informlyco/informly-go"
+	informly "github.com/informlyco/informly-go"
 	core "github.com/informlyco/informly-go/core"
 	internal "github.com/informlyco/informly-go/internal"
 	option "github.com/informlyco/informly-go/option"
@@ -34,9 +34,9 @@ func NewClient(options *core.RequestOptions) *Client {
 
 func (c *Client) ListContacts(
 	ctx context.Context,
-	request *informlygo.ListContactsRequest,
+	request *informly.ListContactsRequest,
 	opts ...option.RequestOption,
-) (*informlygo.ListContactsResponse, error) {
+) (*informly.ListContactsResponse, error) {
 	response, err := c.WithRawResponse.ListContacts(
 		ctx,
 		request,
@@ -50,9 +50,9 @@ func (c *Client) ListContacts(
 
 func (c *Client) CreateContact(
 	ctx context.Context,
-	request *informlygo.CreateContact,
+	request *informly.CreateContact,
 	opts ...option.RequestOption,
-) (*informlygo.CreateContactResponse, error) {
+) (*informly.CreateContactResponse, error) {
 	response, err := c.WithRawResponse.CreateContact(
 		ctx,
 		request,
@@ -66,9 +66,9 @@ func (c *Client) CreateContact(
 
 func (c *Client) GetContact(
 	ctx context.Context,
-	request *informlygo.GetContactRequest,
+	request *informly.GetContactRequest,
 	opts ...option.RequestOption,
-) (*informlygo.GetContactResponse, error) {
+) (*informly.GetContactResponse, error) {
 	response, err := c.WithRawResponse.GetContact(
 		ctx,
 		request,

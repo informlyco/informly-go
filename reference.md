@@ -1,6 +1,6 @@
 # Reference
 ## Contacts
-<details><summary><code>client.Contacts.ListContacts() -> *informlygo.ListContactsResponse</code></summary>
+<details><summary><code>client.Contacts.ListContacts() -> *informly.ListContactsResponse</code></summary>
 <dl>
 <dd>
 
@@ -13,7 +13,14 @@
 <dd>
 
 ```go
-request := &informlygo.ListContactsRequest{}
+request := &informly.ListContactsRequest{
+        Page: informly.Int(
+            1,
+        ),
+        PageSize: informly.Int(
+            20,
+        ),
+    }
 client.Contacts.ListContacts(
         context.TODO(),
         request,
@@ -33,7 +40,7 @@ client.Contacts.ListContacts(
 <dl>
 <dd>
 
-**page:** `*int` 
+**page:** `*int` — Page number (1-indexed)
     
 </dd>
 </dl>
@@ -41,7 +48,7 @@ client.Contacts.ListContacts(
 <dl>
 <dd>
 
-**pageSize:** `*int` 
+**pageSize:** `*int` — Number of items per page (1-100)
     
 </dd>
 </dl>
@@ -53,7 +60,7 @@ client.Contacts.ListContacts(
 </dl>
 </details>
 
-<details><summary><code>client.Contacts.CreateContact(request) -> *informlygo.CreateContactResponse</code></summary>
+<details><summary><code>client.Contacts.CreateContact(request) -> *informly.CreateContactResponse</code></summary>
 <dl>
 <dd>
 
@@ -66,7 +73,7 @@ client.Contacts.ListContacts(
 <dd>
 
 ```go
-request := &informlygo.CreateContact{}
+request := &informly.CreateContact{}
 client.Contacts.CreateContact(
         context.TODO(),
         request,
@@ -86,7 +93,7 @@ client.Contacts.CreateContact(
 <dl>
 <dd>
 
-**email:** `*string` 
+**email:** `*string` — Email address of the contact
     
 </dd>
 </dl>
@@ -94,7 +101,7 @@ client.Contacts.CreateContact(
 <dl>
 <dd>
 
-**phone:** `*string` 
+**phone:** `*string` — Phone number of the contact
     
 </dd>
 </dl>
@@ -102,7 +109,7 @@ client.Contacts.CreateContact(
 <dl>
 <dd>
 
-**firstname:** `*string` 
+**firstname:** `*string` — First name of the contact
     
 </dd>
 </dl>
@@ -110,7 +117,7 @@ client.Contacts.CreateContact(
 <dl>
 <dd>
 
-**lastname:** `*string` 
+**lastname:** `*string` — Last name of the contact
     
 </dd>
 </dl>
@@ -118,7 +125,7 @@ client.Contacts.CreateContact(
 <dl>
 <dd>
 
-**jobtitle:** `*string` 
+**jobtitle:** `*string` — Job title of the contact
     
 </dd>
 </dl>
@@ -126,7 +133,7 @@ client.Contacts.CreateContact(
 <dl>
 <dd>
 
-**company:** `*string` 
+**company:** `*string` — Company of contact (if different) or organization name
     
 </dd>
 </dl>
@@ -138,7 +145,7 @@ client.Contacts.CreateContact(
 </dl>
 </details>
 
-<details><summary><code>client.Contacts.GetContact(ID) -> *informlygo.GetContactResponse</code></summary>
+<details><summary><code>client.Contacts.GetContact(ID) -> *informly.GetContactResponse</code></summary>
 <dl>
 <dd>
 
@@ -151,7 +158,7 @@ client.Contacts.CreateContact(
 <dd>
 
 ```go
-request := &informlygo.GetContactRequest{
+request := &informly.GetContactRequest{
         ID: "id",
     }
 client.Contacts.GetContact(
@@ -173,7 +180,7 @@ client.Contacts.GetContact(
 <dl>
 <dd>
 
-**id:** `string` 
+**id:** `string` — Unique identifier of the resource
     
 </dd>
 </dl>

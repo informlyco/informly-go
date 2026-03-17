@@ -6,7 +6,7 @@ import (
 	bytes "bytes"
 	context "context"
 	json "encoding/json"
-	informlygo "github.com/informlyco/informly-go"
+	informly "github.com/informlyco/informly-go"
 	client "github.com/informlyco/informly-go/client"
 	option "github.com/informlyco/informly-go/option"
 	require "github.com/stretchr/testify/require"
@@ -72,7 +72,14 @@ func TestContactsListContactsWithWireMock(
 	client := client.NewClient(
 		option.WithBaseURL(WireMockBaseURL),
 	)
-	request := &informlygo.ListContactsRequest{}
+	request := &informly.ListContactsRequest{
+		Page: informly.Int(
+			1,
+		),
+		PageSize: informly.Int(
+			20,
+		),
+	}
 	_, invocationErr := client.Contacts.ListContacts(
 		context.TODO(),
 		request,
@@ -82,7 +89,7 @@ func TestContactsListContactsWithWireMock(
 	)
 
 	require.NoError(t, invocationErr, "Client method call should succeed")
-	VerifyRequestCount(t, "TestContactsListContactsWithWireMock", "GET", "/contacts", nil, 1)
+	VerifyRequestCount(t, "TestContactsListContactsWithWireMock", "GET", "/contacts", map[string]string{"page": "1", "pageSize": "20"}, 1)
 }
 
 func TestContactsCreateContactWithWireMock(
@@ -95,7 +102,7 @@ func TestContactsCreateContactWithWireMock(
 	client := client.NewClient(
 		option.WithBaseURL(WireMockBaseURL),
 	)
-	request := &informlygo.CreateContact{}
+	request := &informly.CreateContact{}
 	_, invocationErr := client.Contacts.CreateContact(
 		context.TODO(),
 		request,
@@ -118,7 +125,7 @@ func TestContactsGetContactWithWireMock(
 	client := client.NewClient(
 		option.WithBaseURL(WireMockBaseURL),
 	)
-	request := &informlygo.GetContactRequest{
+	request := &informly.GetContactRequest{
 		ID: "id",
 	}
 	_, invocationErr := client.Contacts.GetContact(

@@ -4,7 +4,7 @@ package contacts
 
 import (
 	context "context"
-	informlygo "github.com/informlyco/informly-go"
+	informly "github.com/informlyco/informly-go"
 	core "github.com/informlyco/informly-go/core"
 	internal "github.com/informlyco/informly-go/internal"
 	option "github.com/informlyco/informly-go/option"
@@ -32,14 +32,14 @@ func NewRawClient(options *core.RequestOptions) *RawClient {
 
 func (r *RawClient) ListContacts(
 	ctx context.Context,
-	request *informlygo.ListContactsRequest,
+	request *informly.ListContactsRequest,
 	opts ...option.RequestOption,
-) (*core.Response[*informlygo.ListContactsResponse], error) {
+) (*core.Response[*informly.ListContactsResponse], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		r.baseURL,
-		"https://api.informly.com/v1",
+		"http://localhost:4000/api/v1",
 	)
 	endpointURL := baseURL + "/contacts"
 	queryParams, err := internal.QueryValues(request)
@@ -53,7 +53,7 @@ func (r *RawClient) ListContacts(
 		r.options.ToHeader(),
 		options.ToHeader(),
 	)
-	var response *informlygo.ListContactsResponse
+	var response *informly.ListContactsResponse
 	raw, err := r.caller.Call(
 		ctx,
 		&internal.CallParams{
@@ -65,13 +65,13 @@ func (r *RawClient) ListContacts(
 			QueryParameters: options.QueryParameters,
 			Client:          options.HTTPClient,
 			Response:        &response,
-			ErrorDecoder:    internal.NewErrorDecoder(informlygo.ErrorCodes),
+			ErrorDecoder:    internal.NewErrorDecoder(informly.ErrorCodes),
 		},
 	)
 	if err != nil {
 		return nil, err
 	}
-	return &core.Response[*informlygo.ListContactsResponse]{
+	return &core.Response[*informly.ListContactsResponse]{
 		StatusCode: raw.StatusCode,
 		Header:     raw.Header,
 		Body:       response,
@@ -80,14 +80,14 @@ func (r *RawClient) ListContacts(
 
 func (r *RawClient) CreateContact(
 	ctx context.Context,
-	request *informlygo.CreateContact,
+	request *informly.CreateContact,
 	opts ...option.RequestOption,
-) (*core.Response[*informlygo.CreateContactResponse], error) {
+) (*core.Response[*informly.CreateContactResponse], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		r.baseURL,
-		"https://api.informly.com/v1",
+		"http://localhost:4000/api/v1",
 	)
 	endpointURL := baseURL + "/contacts"
 	headers := internal.MergeHeaders(
@@ -95,7 +95,7 @@ func (r *RawClient) CreateContact(
 		options.ToHeader(),
 	)
 	headers.Add("Content-Type", "application/json")
-	var response *informlygo.CreateContactResponse
+	var response *informly.CreateContactResponse
 	raw, err := r.caller.Call(
 		ctx,
 		&internal.CallParams{
@@ -108,13 +108,13 @@ func (r *RawClient) CreateContact(
 			Client:          options.HTTPClient,
 			Request:         request,
 			Response:        &response,
-			ErrorDecoder:    internal.NewErrorDecoder(informlygo.ErrorCodes),
+			ErrorDecoder:    internal.NewErrorDecoder(informly.ErrorCodes),
 		},
 	)
 	if err != nil {
 		return nil, err
 	}
-	return &core.Response[*informlygo.CreateContactResponse]{
+	return &core.Response[*informly.CreateContactResponse]{
 		StatusCode: raw.StatusCode,
 		Header:     raw.Header,
 		Body:       response,
@@ -123,14 +123,14 @@ func (r *RawClient) CreateContact(
 
 func (r *RawClient) GetContact(
 	ctx context.Context,
-	request *informlygo.GetContactRequest,
+	request *informly.GetContactRequest,
 	opts ...option.RequestOption,
-) (*core.Response[*informlygo.GetContactResponse], error) {
+) (*core.Response[*informly.GetContactResponse], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		r.baseURL,
-		"https://api.informly.com/v1",
+		"http://localhost:4000/api/v1",
 	)
 	endpointURL := internal.EncodeURL(
 		baseURL+"/contacts/%v",
@@ -140,7 +140,7 @@ func (r *RawClient) GetContact(
 		r.options.ToHeader(),
 		options.ToHeader(),
 	)
-	var response *informlygo.GetContactResponse
+	var response *informly.GetContactResponse
 	raw, err := r.caller.Call(
 		ctx,
 		&internal.CallParams{
@@ -152,13 +152,13 @@ func (r *RawClient) GetContact(
 			QueryParameters: options.QueryParameters,
 			Client:          options.HTTPClient,
 			Response:        &response,
-			ErrorDecoder:    internal.NewErrorDecoder(informlygo.ErrorCodes),
+			ErrorDecoder:    internal.NewErrorDecoder(informly.ErrorCodes),
 		},
 	)
 	if err != nil {
 		return nil, err
 	}
-	return &core.Response[*informlygo.GetContactResponse]{
+	return &core.Response[*informly.GetContactResponse]{
 		StatusCode: raw.StatusCode,
 		Header:     raw.Header,
 		Body:       response,
