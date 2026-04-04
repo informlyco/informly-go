@@ -48,6 +48,7 @@ func (c *Client) ListContacts(
 	return response.Body, nil
 }
 
+// Creates a new contact or updates an existing one if a contact with the same email or phone already exists. Optionally assigns segments and redeems a referral code.
 func (c *Client) CreateContact(
 	ctx context.Context,
 	request *informly.CreateContact,
@@ -64,12 +65,61 @@ func (c *Client) CreateContact(
 	return response.Body, nil
 }
 
+func (c *Client) DeleteContacts(
+	ctx context.Context,
+	request *informly.DeleteContacts,
+	opts ...option.RequestOption,
+) (*informly.DeleteContactsResponse, error) {
+	response, err := c.WithRawResponse.DeleteContacts(
+		ctx,
+		request,
+		opts...,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return response.Body, nil
+}
+
 func (c *Client) GetContact(
 	ctx context.Context,
 	request *informly.GetContactRequest,
 	opts ...option.RequestOption,
 ) (*informly.GetContactResponse, error) {
 	response, err := c.WithRawResponse.GetContact(
+		ctx,
+		request,
+		opts...,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return response.Body, nil
+}
+
+// Updates an existing contact's fields. If segmentIds is provided, it replaces all existing segment assignments.
+func (c *Client) UpdateContact(
+	ctx context.Context,
+	request *informly.UpdateContact,
+	opts ...option.RequestOption,
+) (*informly.UpdateContactResponse, error) {
+	response, err := c.WithRawResponse.UpdateContact(
+		ctx,
+		request,
+		opts...,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return response.Body, nil
+}
+
+func (c *Client) DeleteContact(
+	ctx context.Context,
+	request *informly.DeleteContactRequest,
+	opts ...option.RequestOption,
+) (*informly.DeleteContactResponse, error) {
+	response, err := c.WithRawResponse.DeleteContact(
 		ctx,
 		request,
 		opts...,

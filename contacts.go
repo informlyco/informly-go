@@ -11,18 +11,20 @@ import (
 )
 
 var (
-	createContactFieldEmail     = big.NewInt(1 << 0)
-	createContactFieldPhone     = big.NewInt(1 << 1)
-	createContactFieldFirstname = big.NewInt(1 << 2)
-	createContactFieldLastname  = big.NewInt(1 << 3)
-	createContactFieldJobtitle  = big.NewInt(1 << 4)
-	createContactFieldCompany   = big.NewInt(1 << 5)
+	createContactFieldEmail        = big.NewInt(1 << 0)
+	createContactFieldPhone        = big.NewInt(1 << 1)
+	createContactFieldFirstname    = big.NewInt(1 << 2)
+	createContactFieldLastname     = big.NewInt(1 << 3)
+	createContactFieldJobtitle     = big.NewInt(1 << 4)
+	createContactFieldCompany      = big.NewInt(1 << 5)
+	createContactFieldSegmentIDs   = big.NewInt(1 << 6)
+	createContactFieldReferralCode = big.NewInt(1 << 7)
 )
 
 type CreateContact struct {
-	// Email address of the contact
+	// Email address. Required if phone is not provided.
 	Email *string `json:"email,omitempty" url:"-"`
-	// Phone number of the contact
+	// Phone number in E.164 format. Required if email is not provided.
 	Phone *string `json:"phone,omitempty" url:"-"`
 	// First name of the contact
 	Firstname *string `json:"firstname,omitempty" url:"-"`
@@ -30,8 +32,12 @@ type CreateContact struct {
 	Lastname *string `json:"lastname,omitempty" url:"-"`
 	// Job title of the contact
 	Jobtitle *string `json:"jobtitle,omitempty" url:"-"`
-	// Company of contact (if different) or organization name
+	// Company or organization name
 	Company *string `json:"company,omitempty" url:"-"`
+	// Segment IDs to assign to the contact
+	SegmentIDs []string `json:"segmentIds,omitempty" url:"-"`
+	// Referral code to redeem for this contact
+	ReferralCode *string `json:"referralCode,omitempty" url:"-"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
 	explicitFields *big.Int `json:"-" url:"-"`
@@ -86,6 +92,20 @@ func (c *CreateContact) SetCompany(company *string) {
 	c.require(createContactFieldCompany)
 }
 
+// SetSegmentIDs sets the SegmentIDs field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreateContact) SetSegmentIDs(segmentIDs []string) {
+	c.SegmentIDs = segmentIDs
+	c.require(createContactFieldSegmentIDs)
+}
+
+// SetReferralCode sets the ReferralCode field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *CreateContact) SetReferralCode(referralCode *string) {
+	c.ReferralCode = referralCode
+	c.require(createContactFieldReferralCode)
+}
+
 func (c *CreateContact) UnmarshalJSON(data []byte) error {
 	type unmarshaler CreateContact
 	var body unmarshaler
@@ -104,6 +124,79 @@ func (c *CreateContact) MarshalJSON() ([]byte, error) {
 		embed: embed(*c),
 	}
 	explicitMarshaler := internal.HandleExplicitFields(marshaler, c.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
+var (
+	deleteContactRequestFieldID = big.NewInt(1 << 0)
+)
+
+type DeleteContactRequest struct {
+	// Unique identifier of the resource
+	ID string `json:"-" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (d *DeleteContactRequest) require(field *big.Int) {
+	if d.explicitFields == nil {
+		d.explicitFields = big.NewInt(0)
+	}
+	d.explicitFields.Or(d.explicitFields, field)
+}
+
+// SetID sets the ID field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *DeleteContactRequest) SetID(id string) {
+	d.ID = id
+	d.require(deleteContactRequestFieldID)
+}
+
+var (
+	deleteContactsFieldIDs = big.NewInt(1 << 0)
+)
+
+type DeleteContacts struct {
+	// Contact IDs to delete
+	IDs []string `json:"ids" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (d *DeleteContacts) require(field *big.Int) {
+	if d.explicitFields == nil {
+		d.explicitFields = big.NewInt(0)
+	}
+	d.explicitFields.Or(d.explicitFields, field)
+}
+
+// SetIDs sets the IDs field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *DeleteContacts) SetIDs(ids []string) {
+	d.IDs = ids
+	d.require(deleteContactsFieldIDs)
+}
+
+func (d *DeleteContacts) UnmarshalJSON(data []byte) error {
+	type unmarshaler DeleteContacts
+	var body unmarshaler
+	if err := json.Unmarshal(data, &body); err != nil {
+		return err
+	}
+	*d = DeleteContacts(body)
+	return nil
+}
+
+func (d *DeleteContacts) MarshalJSON() ([]byte, error) {
+	type embed DeleteContacts
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*d),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, d.explicitFields)
 	return json.Marshal(explicitMarshaler)
 }
 
@@ -174,9 +267,10 @@ var (
 	contactFieldEmail          = big.NewInt(1 << 1)
 	contactFieldPhone          = big.NewInt(1 << 2)
 	contactFieldContact        = big.NewInt(1 << 3)
-	contactFieldOrganizationID = big.NewInt(1 << 4)
-	contactFieldCreatedAt      = big.NewInt(1 << 5)
-	contactFieldUpdatedAt      = big.NewInt(1 << 6)
+	contactFieldSegments       = big.NewInt(1 << 4)
+	contactFieldOrganizationID = big.NewInt(1 << 5)
+	contactFieldCreatedAt      = big.NewInt(1 << 6)
+	contactFieldUpdatedAt      = big.NewInt(1 << 7)
 )
 
 type Contact struct {
@@ -184,9 +278,11 @@ type Contact struct {
 	ID string `json:"id" url:"id"`
 	// Email address of the contact
 	Email *string `json:"email,omitempty" url:"email,omitempty"`
-	// Phone number of the contact
+	// Phone number in E.164 format
 	Phone   *string         `json:"phone,omitempty" url:"phone,omitempty"`
 	Contact *ContactContact `json:"contact" url:"contact"`
+	// Segments assigned to this contact
+	Segments []*ContactSegmentsItem `json:"segments,omitempty" url:"segments,omitempty"`
 	// ID of the organization this contact belongs to
 	OrganizationID string `json:"organizationId" url:"organizationId"`
 	// Timestamp when the contact was created
@@ -227,6 +323,13 @@ func (c *Contact) GetContact() *ContactContact {
 		return nil
 	}
 	return c.Contact
+}
+
+func (c *Contact) GetSegments() []*ContactSegmentsItem {
+	if c == nil {
+		return nil
+	}
+	return c.Segments
 }
 
 func (c *Contact) GetOrganizationID() string {
@@ -290,6 +393,13 @@ func (c *Contact) SetPhone(phone *string) {
 func (c *Contact) SetContact(contact *ContactContact) {
 	c.Contact = contact
 	c.require(contactFieldContact)
+}
+
+// SetSegments sets the Segments field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *Contact) SetSegments(segments []*ContactSegmentsItem) {
+	c.Segments = segments
+	c.require(contactFieldSegments)
 }
 
 // SetOrganizationID sets the OrganizationID field and marks it as non-optional;
@@ -489,6 +599,116 @@ func (c *ContactContact) MarshalJSON() ([]byte, error) {
 }
 
 func (c *ContactContact) String() string {
+	if c == nil {
+		return "<nil>"
+	}
+	if len(c.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(c.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(c); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", c)
+}
+
+var (
+	contactSegmentsItemFieldSegmentID  = big.NewInt(1 << 0)
+	contactSegmentsItemFieldAssignedAt = big.NewInt(1 << 1)
+)
+
+type ContactSegmentsItem struct {
+	// Segment identifier
+	SegmentID string `json:"segmentId" url:"segmentId"`
+	// When the segment was assigned
+	AssignedAt time.Time `json:"assignedAt" url:"assignedAt"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (c *ContactSegmentsItem) GetSegmentID() string {
+	if c == nil {
+		return ""
+	}
+	return c.SegmentID
+}
+
+func (c *ContactSegmentsItem) GetAssignedAt() time.Time {
+	if c == nil {
+		return time.Time{}
+	}
+	return c.AssignedAt
+}
+
+func (c *ContactSegmentsItem) GetExtraProperties() map[string]interface{} {
+	if c == nil {
+		return nil
+	}
+	return c.extraProperties
+}
+
+func (c *ContactSegmentsItem) require(field *big.Int) {
+	if c.explicitFields == nil {
+		c.explicitFields = big.NewInt(0)
+	}
+	c.explicitFields.Or(c.explicitFields, field)
+}
+
+// SetSegmentID sets the SegmentID field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *ContactSegmentsItem) SetSegmentID(segmentID string) {
+	c.SegmentID = segmentID
+	c.require(contactSegmentsItemFieldSegmentID)
+}
+
+// SetAssignedAt sets the AssignedAt field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (c *ContactSegmentsItem) SetAssignedAt(assignedAt time.Time) {
+	c.AssignedAt = assignedAt
+	c.require(contactSegmentsItemFieldAssignedAt)
+}
+
+func (c *ContactSegmentsItem) UnmarshalJSON(data []byte) error {
+	type embed ContactSegmentsItem
+	var unmarshaler = struct {
+		embed
+		AssignedAt *internal.DateTime `json:"assignedAt"`
+	}{
+		embed: embed(*c),
+	}
+	if err := json.Unmarshal(data, &unmarshaler); err != nil {
+		return err
+	}
+	*c = ContactSegmentsItem(unmarshaler.embed)
+	c.AssignedAt = unmarshaler.AssignedAt.Time()
+	extraProperties, err := internal.ExtractExtraProperties(data, *c)
+	if err != nil {
+		return err
+	}
+	c.extraProperties = extraProperties
+	c.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (c *ContactSegmentsItem) MarshalJSON() ([]byte, error) {
+	type embed ContactSegmentsItem
+	var marshaler = struct {
+		embed
+		AssignedAt *internal.DateTime `json:"assignedAt"`
+	}{
+		embed:      embed(*c),
+		AssignedAt: internal.NewDateTime(c.AssignedAt),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, c.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
+func (c *ContactSegmentsItem) String() string {
 	if c == nil {
 		return "<nil>"
 	}
@@ -724,6 +944,259 @@ func (c *CreateContactResponse) String() string {
 }
 
 var (
+	deleteContactResponseFieldData = big.NewInt(1 << 0)
+)
+
+type DeleteContactResponse struct {
+	Data *Contact `json:"data" url:"data"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (d *DeleteContactResponse) GetData() *Contact {
+	if d == nil {
+		return nil
+	}
+	return d.Data
+}
+
+func (d *DeleteContactResponse) GetExtraProperties() map[string]interface{} {
+	if d == nil {
+		return nil
+	}
+	return d.extraProperties
+}
+
+func (d *DeleteContactResponse) require(field *big.Int) {
+	if d.explicitFields == nil {
+		d.explicitFields = big.NewInt(0)
+	}
+	d.explicitFields.Or(d.explicitFields, field)
+}
+
+// SetData sets the Data field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *DeleteContactResponse) SetData(data *Contact) {
+	d.Data = data
+	d.require(deleteContactResponseFieldData)
+}
+
+func (d *DeleteContactResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler DeleteContactResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*d = DeleteContactResponse(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *d)
+	if err != nil {
+		return err
+	}
+	d.extraProperties = extraProperties
+	d.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (d *DeleteContactResponse) MarshalJSON() ([]byte, error) {
+	type embed DeleteContactResponse
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*d),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, d.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
+func (d *DeleteContactResponse) String() string {
+	if d == nil {
+		return "<nil>"
+	}
+	if len(d.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(d.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(d); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", d)
+}
+
+var (
+	deleteContactsResponseFieldData = big.NewInt(1 << 0)
+)
+
+type DeleteContactsResponse struct {
+	Data *DeleteContactsResponseData `json:"data" url:"data"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (d *DeleteContactsResponse) GetData() *DeleteContactsResponseData {
+	if d == nil {
+		return nil
+	}
+	return d.Data
+}
+
+func (d *DeleteContactsResponse) GetExtraProperties() map[string]interface{} {
+	if d == nil {
+		return nil
+	}
+	return d.extraProperties
+}
+
+func (d *DeleteContactsResponse) require(field *big.Int) {
+	if d.explicitFields == nil {
+		d.explicitFields = big.NewInt(0)
+	}
+	d.explicitFields.Or(d.explicitFields, field)
+}
+
+// SetData sets the Data field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *DeleteContactsResponse) SetData(data *DeleteContactsResponseData) {
+	d.Data = data
+	d.require(deleteContactsResponseFieldData)
+}
+
+func (d *DeleteContactsResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler DeleteContactsResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*d = DeleteContactsResponse(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *d)
+	if err != nil {
+		return err
+	}
+	d.extraProperties = extraProperties
+	d.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (d *DeleteContactsResponse) MarshalJSON() ([]byte, error) {
+	type embed DeleteContactsResponse
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*d),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, d.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
+func (d *DeleteContactsResponse) String() string {
+	if d == nil {
+		return "<nil>"
+	}
+	if len(d.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(d.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(d); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", d)
+}
+
+var (
+	deleteContactsResponseDataFieldCount = big.NewInt(1 << 0)
+)
+
+type DeleteContactsResponseData struct {
+	// Number of contacts deleted
+	Count float64 `json:"count" url:"count"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (d *DeleteContactsResponseData) GetCount() float64 {
+	if d == nil {
+		return 0
+	}
+	return d.Count
+}
+
+func (d *DeleteContactsResponseData) GetExtraProperties() map[string]interface{} {
+	if d == nil {
+		return nil
+	}
+	return d.extraProperties
+}
+
+func (d *DeleteContactsResponseData) require(field *big.Int) {
+	if d.explicitFields == nil {
+		d.explicitFields = big.NewInt(0)
+	}
+	d.explicitFields.Or(d.explicitFields, field)
+}
+
+// SetCount sets the Count field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (d *DeleteContactsResponseData) SetCount(count float64) {
+	d.Count = count
+	d.require(deleteContactsResponseDataFieldCount)
+}
+
+func (d *DeleteContactsResponseData) UnmarshalJSON(data []byte) error {
+	type unmarshaler DeleteContactsResponseData
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*d = DeleteContactsResponseData(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *d)
+	if err != nil {
+		return err
+	}
+	d.extraProperties = extraProperties
+	d.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (d *DeleteContactsResponseData) MarshalJSON() ([]byte, error) {
+	type embed DeleteContactsResponseData
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*d),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, d.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
+func (d *DeleteContactsResponseData) String() string {
+	if d == nil {
+		return "<nil>"
+	}
+	if len(d.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(d.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(d); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", d)
+}
+
+var (
 	getContactResponseFieldData = big.NewInt(1 << 0)
 )
 
@@ -905,4 +1378,205 @@ func (l *ListContactsResponse) String() string {
 		return value
 	}
 	return fmt.Sprintf("%#v", l)
+}
+
+var (
+	updateContactResponseFieldData = big.NewInt(1 << 0)
+)
+
+type UpdateContactResponse struct {
+	Data *Contact `json:"data" url:"data"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+
+	extraProperties map[string]interface{}
+	rawJSON         json.RawMessage
+}
+
+func (u *UpdateContactResponse) GetData() *Contact {
+	if u == nil {
+		return nil
+	}
+	return u.Data
+}
+
+func (u *UpdateContactResponse) GetExtraProperties() map[string]interface{} {
+	if u == nil {
+		return nil
+	}
+	return u.extraProperties
+}
+
+func (u *UpdateContactResponse) require(field *big.Int) {
+	if u.explicitFields == nil {
+		u.explicitFields = big.NewInt(0)
+	}
+	u.explicitFields.Or(u.explicitFields, field)
+}
+
+// SetData sets the Data field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (u *UpdateContactResponse) SetData(data *Contact) {
+	u.Data = data
+	u.require(updateContactResponseFieldData)
+}
+
+func (u *UpdateContactResponse) UnmarshalJSON(data []byte) error {
+	type unmarshaler UpdateContactResponse
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	*u = UpdateContactResponse(value)
+	extraProperties, err := internal.ExtractExtraProperties(data, *u)
+	if err != nil {
+		return err
+	}
+	u.extraProperties = extraProperties
+	u.rawJSON = json.RawMessage(data)
+	return nil
+}
+
+func (u *UpdateContactResponse) MarshalJSON() ([]byte, error) {
+	type embed UpdateContactResponse
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*u),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, u.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
+func (u *UpdateContactResponse) String() string {
+	if u == nil {
+		return "<nil>"
+	}
+	if len(u.rawJSON) > 0 {
+		if value, err := internal.StringifyJSON(u.rawJSON); err == nil {
+			return value
+		}
+	}
+	if value, err := internal.StringifyJSON(u); err == nil {
+		return value
+	}
+	return fmt.Sprintf("%#v", u)
+}
+
+var (
+	updateContactFieldID         = big.NewInt(1 << 0)
+	updateContactFieldEmail      = big.NewInt(1 << 1)
+	updateContactFieldPhone      = big.NewInt(1 << 2)
+	updateContactFieldFirstname  = big.NewInt(1 << 3)
+	updateContactFieldLastname   = big.NewInt(1 << 4)
+	updateContactFieldJobtitle   = big.NewInt(1 << 5)
+	updateContactFieldCompany    = big.NewInt(1 << 6)
+	updateContactFieldSegmentIDs = big.NewInt(1 << 7)
+)
+
+type UpdateContact struct {
+	// Unique identifier of the resource
+	ID string `json:"-" url:"-"`
+	// Email address of the contact
+	Email *string `json:"email,omitempty" url:"-"`
+	// Phone number in E.164 format (e.g. +14155552671)
+	Phone *string `json:"phone,omitempty" url:"-"`
+	// First name of the contact
+	Firstname *string `json:"firstname,omitempty" url:"-"`
+	// Last name of the contact
+	Lastname *string `json:"lastname,omitempty" url:"-"`
+	// Job title of the contact
+	Jobtitle *string `json:"jobtitle,omitempty" url:"-"`
+	// Company or organization name
+	Company *string `json:"company,omitempty" url:"-"`
+	// Segment IDs to assign (replaces existing segments)
+	SegmentIDs []string `json:"segmentIds,omitempty" url:"-"`
+
+	// Private bitmask of fields set to an explicit value and therefore not to be omitted
+	explicitFields *big.Int `json:"-" url:"-"`
+}
+
+func (u *UpdateContact) require(field *big.Int) {
+	if u.explicitFields == nil {
+		u.explicitFields = big.NewInt(0)
+	}
+	u.explicitFields.Or(u.explicitFields, field)
+}
+
+// SetID sets the ID field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (u *UpdateContact) SetID(id string) {
+	u.ID = id
+	u.require(updateContactFieldID)
+}
+
+// SetEmail sets the Email field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (u *UpdateContact) SetEmail(email *string) {
+	u.Email = email
+	u.require(updateContactFieldEmail)
+}
+
+// SetPhone sets the Phone field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (u *UpdateContact) SetPhone(phone *string) {
+	u.Phone = phone
+	u.require(updateContactFieldPhone)
+}
+
+// SetFirstname sets the Firstname field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (u *UpdateContact) SetFirstname(firstname *string) {
+	u.Firstname = firstname
+	u.require(updateContactFieldFirstname)
+}
+
+// SetLastname sets the Lastname field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (u *UpdateContact) SetLastname(lastname *string) {
+	u.Lastname = lastname
+	u.require(updateContactFieldLastname)
+}
+
+// SetJobtitle sets the Jobtitle field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (u *UpdateContact) SetJobtitle(jobtitle *string) {
+	u.Jobtitle = jobtitle
+	u.require(updateContactFieldJobtitle)
+}
+
+// SetCompany sets the Company field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (u *UpdateContact) SetCompany(company *string) {
+	u.Company = company
+	u.require(updateContactFieldCompany)
+}
+
+// SetSegmentIDs sets the SegmentIDs field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (u *UpdateContact) SetSegmentIDs(segmentIDs []string) {
+	u.SegmentIDs = segmentIDs
+	u.require(updateContactFieldSegmentIDs)
+}
+
+func (u *UpdateContact) UnmarshalJSON(data []byte) error {
+	type unmarshaler UpdateContact
+	var body unmarshaler
+	if err := json.Unmarshal(data, &body); err != nil {
+		return err
+	}
+	*u = UpdateContact(body)
+	return nil
+}
+
+func (u *UpdateContact) MarshalJSON() ([]byte, error) {
+	type embed UpdateContact
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*u),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, u.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }

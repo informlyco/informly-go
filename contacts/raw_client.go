@@ -39,7 +39,7 @@ func (r *RawClient) ListContacts(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		r.baseURL,
-		"http://localhost:4000/api/v1",
+		"https://api.informly.co/api/v1",
 	)
 	endpointURL := baseURL + "/contacts"
 	queryParams, err := internal.QueryValues(request)
@@ -87,7 +87,7 @@ func (r *RawClient) CreateContact(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		r.baseURL,
-		"http://localhost:4000/api/v1",
+		"https://api.informly.co/api/v1",
 	)
 	endpointURL := baseURL + "/contacts"
 	headers := internal.MergeHeaders(
@@ -121,6 +121,49 @@ func (r *RawClient) CreateContact(
 	}, nil
 }
 
+func (r *RawClient) DeleteContacts(
+	ctx context.Context,
+	request *informly.DeleteContacts,
+	opts ...option.RequestOption,
+) (*core.Response[*informly.DeleteContactsResponse], error) {
+	options := core.NewRequestOptions(opts...)
+	baseURL := internal.ResolveBaseURL(
+		options.BaseURL,
+		r.baseURL,
+		"https://api.informly.co/api/v1",
+	)
+	endpointURL := baseURL + "/contacts"
+	headers := internal.MergeHeaders(
+		r.options.ToHeader(),
+		options.ToHeader(),
+	)
+	headers.Add("Content-Type", "application/json")
+	var response *informly.DeleteContactsResponse
+	raw, err := r.caller.Call(
+		ctx,
+		&internal.CallParams{
+			URL:             endpointURL,
+			Method:          http.MethodDelete,
+			Headers:         headers,
+			MaxAttempts:     options.MaxAttempts,
+			BodyProperties:  options.BodyProperties,
+			QueryParameters: options.QueryParameters,
+			Client:          options.HTTPClient,
+			Request:         request,
+			Response:        &response,
+			ErrorDecoder:    internal.NewErrorDecoder(informly.ErrorCodes),
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &core.Response[*informly.DeleteContactsResponse]{
+		StatusCode: raw.StatusCode,
+		Header:     raw.Header,
+		Body:       response,
+	}, nil
+}
+
 func (r *RawClient) GetContact(
 	ctx context.Context,
 	request *informly.GetContactRequest,
@@ -130,7 +173,7 @@ func (r *RawClient) GetContact(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		r.baseURL,
-		"http://localhost:4000/api/v1",
+		"https://api.informly.co/api/v1",
 	)
 	endpointURL := internal.EncodeURL(
 		baseURL+"/contacts/%v",
@@ -159,6 +202,96 @@ func (r *RawClient) GetContact(
 		return nil, err
 	}
 	return &core.Response[*informly.GetContactResponse]{
+		StatusCode: raw.StatusCode,
+		Header:     raw.Header,
+		Body:       response,
+	}, nil
+}
+
+func (r *RawClient) UpdateContact(
+	ctx context.Context,
+	request *informly.UpdateContact,
+	opts ...option.RequestOption,
+) (*core.Response[*informly.UpdateContactResponse], error) {
+	options := core.NewRequestOptions(opts...)
+	baseURL := internal.ResolveBaseURL(
+		options.BaseURL,
+		r.baseURL,
+		"https://api.informly.co/api/v1",
+	)
+	endpointURL := internal.EncodeURL(
+		baseURL+"/contacts/%v",
+		request.ID,
+	)
+	headers := internal.MergeHeaders(
+		r.options.ToHeader(),
+		options.ToHeader(),
+	)
+	headers.Add("Content-Type", "application/json")
+	var response *informly.UpdateContactResponse
+	raw, err := r.caller.Call(
+		ctx,
+		&internal.CallParams{
+			URL:             endpointURL,
+			Method:          http.MethodPut,
+			Headers:         headers,
+			MaxAttempts:     options.MaxAttempts,
+			BodyProperties:  options.BodyProperties,
+			QueryParameters: options.QueryParameters,
+			Client:          options.HTTPClient,
+			Request:         request,
+			Response:        &response,
+			ErrorDecoder:    internal.NewErrorDecoder(informly.ErrorCodes),
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &core.Response[*informly.UpdateContactResponse]{
+		StatusCode: raw.StatusCode,
+		Header:     raw.Header,
+		Body:       response,
+	}, nil
+}
+
+func (r *RawClient) DeleteContact(
+	ctx context.Context,
+	request *informly.DeleteContactRequest,
+	opts ...option.RequestOption,
+) (*core.Response[*informly.DeleteContactResponse], error) {
+	options := core.NewRequestOptions(opts...)
+	baseURL := internal.ResolveBaseURL(
+		options.BaseURL,
+		r.baseURL,
+		"https://api.informly.co/api/v1",
+	)
+	endpointURL := internal.EncodeURL(
+		baseURL+"/contacts/%v",
+		request.ID,
+	)
+	headers := internal.MergeHeaders(
+		r.options.ToHeader(),
+		options.ToHeader(),
+	)
+	var response *informly.DeleteContactResponse
+	raw, err := r.caller.Call(
+		ctx,
+		&internal.CallParams{
+			URL:             endpointURL,
+			Method:          http.MethodDelete,
+			Headers:         headers,
+			MaxAttempts:     options.MaxAttempts,
+			BodyProperties:  options.BodyProperties,
+			QueryParameters: options.QueryParameters,
+			Client:          options.HTTPClient,
+			Response:        &response,
+			ErrorDecoder:    internal.NewErrorDecoder(informly.ErrorCodes),
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &core.Response[*informly.DeleteContactResponse]{
 		StatusCode: raw.StatusCode,
 		Header:     raw.Header,
 		Body:       response,

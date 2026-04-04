@@ -115,6 +115,33 @@ func TestContactsCreateContactWithWireMock(
 	VerifyRequestCount(t, "TestContactsCreateContactWithWireMock", "POST", "/contacts", nil, 1)
 }
 
+func TestContactsDeleteContactsWithWireMock(
+	t *testing.T,
+) {
+	WireMockBaseURL := os.Getenv("WIREMOCK_URL")
+	if WireMockBaseURL == "" {
+		WireMockBaseURL = "http://localhost:8080"
+	}
+	client := client.NewClient(
+		option.WithBaseURL(WireMockBaseURL),
+	)
+	request := &informly.DeleteContacts{
+		IDs: []string{
+			"ids",
+		},
+	}
+	_, invocationErr := client.Contacts.DeleteContacts(
+		context.TODO(),
+		request,
+		option.WithHTTPHeader(
+			http.Header{"X-Test-Id": []string{"TestContactsDeleteContactsWithWireMock"}},
+		),
+	)
+
+	require.NoError(t, invocationErr, "Client method call should succeed")
+	VerifyRequestCount(t, "TestContactsDeleteContactsWithWireMock", "DELETE", "/contacts", nil, 1)
+}
+
 func TestContactsGetContactWithWireMock(
 	t *testing.T,
 ) {
@@ -138,4 +165,54 @@ func TestContactsGetContactWithWireMock(
 
 	require.NoError(t, invocationErr, "Client method call should succeed")
 	VerifyRequestCount(t, "TestContactsGetContactWithWireMock", "GET", "/contacts/id", nil, 1)
+}
+
+func TestContactsUpdateContactWithWireMock(
+	t *testing.T,
+) {
+	WireMockBaseURL := os.Getenv("WIREMOCK_URL")
+	if WireMockBaseURL == "" {
+		WireMockBaseURL = "http://localhost:8080"
+	}
+	client := client.NewClient(
+		option.WithBaseURL(WireMockBaseURL),
+	)
+	request := &informly.UpdateContact{
+		ID: "id",
+	}
+	_, invocationErr := client.Contacts.UpdateContact(
+		context.TODO(),
+		request,
+		option.WithHTTPHeader(
+			http.Header{"X-Test-Id": []string{"TestContactsUpdateContactWithWireMock"}},
+		),
+	)
+
+	require.NoError(t, invocationErr, "Client method call should succeed")
+	VerifyRequestCount(t, "TestContactsUpdateContactWithWireMock", "PUT", "/contacts/id", nil, 1)
+}
+
+func TestContactsDeleteContactWithWireMock(
+	t *testing.T,
+) {
+	WireMockBaseURL := os.Getenv("WIREMOCK_URL")
+	if WireMockBaseURL == "" {
+		WireMockBaseURL = "http://localhost:8080"
+	}
+	client := client.NewClient(
+		option.WithBaseURL(WireMockBaseURL),
+	)
+	request := &informly.DeleteContactRequest{
+		ID: "id",
+	}
+	_, invocationErr := client.Contacts.DeleteContact(
+		context.TODO(),
+		request,
+		option.WithHTTPHeader(
+			http.Header{"X-Test-Id": []string{"TestContactsDeleteContactWithWireMock"}},
+		),
+	)
+
+	require.NoError(t, invocationErr, "Client method call should succeed")
+	VerifyRequestCount(t, "TestContactsDeleteContactWithWireMock", "DELETE", "/contacts/id", nil, 1)
 }
