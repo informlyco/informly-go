@@ -29,10 +29,11 @@ Instantiate and use the client with the following:
 package example
 
 import (
+    context "context"
+
+    informly "github.com/informlyco/informly-go"
     client "github.com/informlyco/informly-go/client"
     option "github.com/informlyco/informly-go/option"
-    informly "github.com/informlyco/informly-go"
-    context "context"
 )
 
 func do() {

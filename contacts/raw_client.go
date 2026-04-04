@@ -4,11 +4,12 @@ package contacts
 
 import (
 	context "context"
+	http "net/http"
+
 	informly "github.com/informlyco/informly-go"
 	core "github.com/informlyco/informly-go/core"
 	internal "github.com/informlyco/informly-go/internal"
 	option "github.com/informlyco/informly-go/option"
-	http "net/http"
 )
 
 type RawClient struct {

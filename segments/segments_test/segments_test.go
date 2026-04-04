@@ -6,12 +6,13 @@ import (
 	bytes "bytes"
 	context "context"
 	json "encoding/json"
-	client "github.com/informlyco/informly-go/client"
-	option "github.com/informlyco/informly-go/option"
-	require "github.com/stretchr/testify/require"
 	http "net/http"
 	os "os"
 	testing "testing"
+
+	client "github.com/informlyco/informly-go/client"
+	option "github.com/informlyco/informly-go/option"
+	require "github.com/stretchr/testify/require"
 )
 
 func VerifyRequestCount(

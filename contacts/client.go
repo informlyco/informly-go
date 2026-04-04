@@ -4,6 +4,7 @@ package contacts
 
 import (
 	context "context"
+
 	informly "github.com/informlyco/informly-go"
 	core "github.com/informlyco/informly-go/core"
 	internal "github.com/informlyco/informly-go/internal"
