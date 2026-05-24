@@ -40,7 +40,7 @@ func (r *RawClient) ListContacts(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		r.baseURL,
-		"https://api.informly.co/api/v1",
+		"https://api.informly.co/v1",
 	)
 	endpointURL := baseURL + "/contacts"
 	queryParams, err := internal.QueryValues(request)
@@ -88,7 +88,7 @@ func (r *RawClient) CreateContact(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		r.baseURL,
-		"https://api.informly.co/api/v1",
+		"https://api.informly.co/v1",
 	)
 	endpointURL := baseURL + "/contacts"
 	headers := internal.MergeHeaders(
@@ -131,7 +131,7 @@ func (r *RawClient) DeleteContacts(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		r.baseURL,
-		"https://api.informly.co/api/v1",
+		"https://api.informly.co/v1",
 	)
 	endpointURL := baseURL + "/contacts"
 	headers := internal.MergeHeaders(
@@ -174,7 +174,7 @@ func (r *RawClient) GetContact(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		r.baseURL,
-		"https://api.informly.co/api/v1",
+		"https://api.informly.co/v1",
 	)
 	endpointURL := internal.EncodeURL(
 		baseURL+"/contacts/%v",
@@ -218,7 +218,7 @@ func (r *RawClient) UpdateContact(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		r.baseURL,
-		"https://api.informly.co/api/v1",
+		"https://api.informly.co/v1",
 	)
 	endpointURL := internal.EncodeURL(
 		baseURL+"/contacts/%v",
@@ -264,7 +264,7 @@ func (r *RawClient) DeleteContact(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		r.baseURL,
-		"https://api.informly.co/api/v1",
+		"https://api.informly.co/v1",
 	)
 	endpointURL := internal.EncodeURL(
 		baseURL+"/contacts/%v",

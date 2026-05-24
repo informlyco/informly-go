@@ -39,7 +39,7 @@ func (r *RawClient) ListSegments(
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
 		r.baseURL,
-		"https://api.informly.co/api/v1",
+		"https://api.informly.co/v1",
 	)
 	endpointURL := baseURL + "/segments"
 	headers := internal.MergeHeaders(
